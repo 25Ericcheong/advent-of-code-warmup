@@ -1,0 +1,5 @@
+package secretentrance
+
+func LoadData() {
+
+}
