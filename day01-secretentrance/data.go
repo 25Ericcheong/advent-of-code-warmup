@@ -1,4 +1,11 @@
-package secretentrance
+package day01_secretentrance
+
+import (
+	"bufio"
+	"fmt"
+	"log"
+	"os"
+)
 
 type Dial struct {
 	Count           int
@@ -37,5 +44,23 @@ func (d *Dial) plusPasswordCounterIfNeeded() {
 }
 
 func LoadData() {
+	file, err := os.Open("./day01-secretentrance/input.txt")
+	if err != nil {
+		log.Fatalf("Error opening file - %s", err.Error())
+	}
+	defer func(file *os.File) {
+		err = file.Close()
+		if err != nil {
+			log.Fatalf("Error closing file - %s", err.Error())
+		}
+	}(file)
 
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Fatalf("Error scanning input - %s", err.Error())
+	}
 }
