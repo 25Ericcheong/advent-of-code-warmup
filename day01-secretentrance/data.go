@@ -60,7 +60,7 @@ func (d *Dial) plusPasswordCounterIfNeeded() {
 	}
 }
 
-func LoadData() {
+func LoadAndProcessData() {
 	file, err := os.Open("./day01-secretentrance/input.txt")
 	if err != nil {
 		log.Fatalf("error opening file - %s", err.Error())
@@ -111,6 +111,6 @@ func LoadData() {
 	}
 
 	fmt.Println()
-	log.Println("=== SUCCESS ===")
-	log.Printf("Password value found to be - %v", dial.PasswordCounter)
+	fmt.Println("=== SUCCESS ===")
+	fmt.Printf("\nPassword value found to be - %v", dial.PasswordCounter)
 }
