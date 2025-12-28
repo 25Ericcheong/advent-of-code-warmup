@@ -11,6 +11,9 @@ import (
 type Dial struct {
 	Count           int
 	PasswordCounter int
+
+	// Counts number of times 0 has passed
+	NewPasswordCounter int
 }
 
 func CreateDial(startCount int) Dial {
@@ -21,7 +24,8 @@ func CreateDial(startCount int) Dial {
 }
 
 const initialDialCount = 50
-const minDialCount = 0
+const minDialCount = -1
+const zeroDialCount = 0
 const maxDialCount = 99
 
 const normalizeCount = 100
@@ -30,33 +34,38 @@ const LEFT = "L"
 const RIGHT = "R"
 
 func (d *Dial) TurnLeft(number int) {
+	if (d.Count - (number % normalizeCount)) == zeroDialCount {
+		d.NewPasswordCounter++
+	}
+
 	d.Count -= number
+
+	if d.Count == zeroDialCount {
+		d.NewPasswordCounter++
+	}
 
 	// Number being passed can be fairly large; important to understand the concept of a "dial"
 	// Need to continue to increase till it lies within (or on) the boundaries of 0-99
-	for d.Count < minDialCount {
+	for d.Count < zeroDialCount {
+		d.NewPasswordCounter++
 		d.Count += normalizeCount
 	}
-
-	d.plusPasswordCounterIfNeeded()
 }
 
 func (d *Dial) TurnRight(number int) {
 	d.Count += number
 
 	// Number being passed can be fairly large; important to understand the concept of a "dial"
-	// Need to continue to increase till it lies within (or on) the boundaries of 0-99
+	// Need to continue to decrease till it lies within (or on) the boundaries of 0-99
 	for d.Count > maxDialCount {
-		d.Count %= normalizeCount
+		d.NewPasswordCounter++
+		d.Count -= normalizeCount
 	}
-
-	d.plusPasswordCounterIfNeeded()
 }
 
 func (d *Dial) plusPasswordCounterIfNeeded() {
 	if d.Count == minDialCount {
 		d.PasswordCounter += 1
-		fmt.Printf("\nPASSWORD INCREASE - %v", d.PasswordCounter)
 	}
 }
 
@@ -90,6 +99,7 @@ func LoadAndProcessData() {
 		}
 
 		fmt.Printf(" NEW LINE: %s", scanner.Text())
+		fmt.Printf("\n BEFORE COUNT: %d", dial.NewPasswordCounter)
 		beforeCount := dial.Count
 		if line[0:1] == LEFT {
 
@@ -103,6 +113,7 @@ func LoadAndProcessData() {
 			log.Fatal("unexpected value encountered while dialing")
 		}
 
+		fmt.Printf("\n AFTER COUNT: %d", dial.NewPasswordCounter)
 		fmt.Println("\n===")
 	}
 
@@ -112,5 +123,5 @@ func LoadAndProcessData() {
 
 	fmt.Println()
 	fmt.Println("=== SUCCESS ===")
-	fmt.Printf("\nPassword value found to be - %v", dial.PasswordCounter)
+	fmt.Printf("\nNEW Password value found to be - %v", dial.NewPasswordCounter)
 }
